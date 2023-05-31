@@ -1,10 +1,67 @@
 import tkinter as tk
 import matplotlib.pyplot as plt
-from vlz77 import vlz77_compress
-from lz77 import lz77_compress
+
+def lz77_compress(data, window_size=10):
+    compressed_data = []
+    pos = 0
+
+    while pos < len(data):
+        max_length = 0
+        max_offset = 0
+
+        for i in range(1, min(window_size+1, pos+1)):
+            substring = data[pos-i:pos]
+            length = 0
+            offset = 0
+
+            while length < len(substring) and pos + length < len(data) and substring[length] == data[pos + length]:
+                length += 1
+
+            if length > max_length:
+                max_length = length
+                max_offset = i
+
+        if max_length > 0:
+            compressed_data.append((max_offset, max_length, data[pos + max_length]))
+            pos += max_length + 1
+        else:
+            compressed_data.append((0, 0, data[pos]))
+            pos += 1
+
+    return compressed_data
+
+
+def vlz77_compress(data, window_size=10):
+    compressed_data = []
+    pos = 0
+
+    while pos < len(data):
+        max_length = 0
+        max_offset = 0
+
+        for i in range(1, min(window_size+1, pos+1)):
+            substring = data[pos-i:pos]
+            length = 0
+            offset = 0
+
+            while length < len(substring) and pos + length < len(data) and substring[length] == data[pos + length]:
+                length += 1
+
+            if length > max_length:
+                max_length = length
+                max_offset = i
+
+        if max_length > 0:
+            compressed_data.append((max_offset, max_length, data[pos + max_length]))
+            pos += max_length + 1
+        else:
+            compressed_data.append((0, 0, data[pos]))
+            pos += 1
+
+    return compressed_data
+
 
 def run_proof():
-    # Original dataset
     original_data = "AAAAABBBCCCCCDDDDDEEEEE"
 
     # Perform vLZ77 compression
@@ -23,6 +80,7 @@ def run_proof():
     plt.ylabel("Compression Ratio")
     plt.title("vLZ77 vs LZ77 Compression")
     plt.show()
+
 
 # Create the GUI window
 window = tk.Tk()
